@@ -70,10 +70,10 @@ const Loginscreen=()=>{
         error:false,
     });
     const [emailInfor, setEmailInfor] = useState({
-        email:"",
-        displayName:"",
-        phoneNumber:"",
-        token:"",
+        email: null,
+        displayName:null ,
+        phoneNumber: null,
+        token:null,
     });
     
     const pressshow=async (erremail,errpass)=>{
@@ -91,29 +91,24 @@ const Loginscreen=()=>{
             error: true,
         });
     }
-    const processEmailInfor=async (UserInfor)=>{
-        setEmailInfor({
-            email: UserInfor.email,
-            displayName: UserInfor.displayName,
-            phoneNumber: UserInfor.phoneNumber,
-    });
-    setschema({
-        email:UserInfor.email,
-    })
-    console.log(schema.email)
+    const processEmailInfor = async () => {
+        await auth().onAuthStateChanged(function (user) {
+            setEmailInfor({
+                email: user.email,
+                displayName: user.displayName,
+                phoneNumber: user.phoneNumber,
+            })
+        });
+        console.log(emailInfor);
+        signIn();
     }
-    const onEmailSignIn=async (values)=>{
-        if(emailLoading) return;
-        if(!schema.error){
-            try {
-                setEmailLoading(true);
-                await auth().signInWithEmailAndPassword(values.email, values.password).then((res) => {processEmailInfor(res.user),console.log(res.user)}).catch(err=>console.log(err));
-                let content = await auth().currentUser.getIdTokenResult();
-                console.log(emailInfor);
-                signIn(emailInfor);
-            } catch (err) {
-                console.log(err);
-            };
+    const onEmailSignIn = async (values) => {
+        if (emailLoading) return;
+        try {
+            setEmailLoading(true);
+            await auth().signInWithEmailAndPassword(values.email, values.password).then(() => processEmailInfor()).catch(err => console.log(err));
+        } catch (err) {
+            console.log(err);
         }
     }
             //   onSubmit={(values) => 

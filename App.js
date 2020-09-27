@@ -1,7 +1,8 @@
 
 
-import React from 'react';
-import { AsyncStorage, LogBox} from 'react-native'
+import React,{useState} from 'react';
+import {  LogBox} from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage'
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs'
 import {createStackNavigator} from '@react-navigation/stack'
 import Searchscr from './src/screens/Search/index'
@@ -31,16 +32,7 @@ LogBox.ignoreLogs(['Require cycle:']);
 
 import { AuthContext} from './src/utils/Context'
 
-function Signinscreen() {
 
-  const { signIn } = React.useContext(AuthContext);
-  const Login = (email, password) => {
-    signIn({ email, password })
-  };
-  return (
-    <Loginscreen Login={Login} />
-  );
-}
 const Stack = createStackNavigator();
 
 function Search() {
@@ -91,6 +83,12 @@ function BottomNavigator() {
 }
 
 export default function App({ navigation }) {
+  const [emailInfor, setEmailInfor] = useState({
+    email: null,
+    displayName: null,
+    phoneNumber: null,
+    token: null,
+  });
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -137,13 +135,7 @@ export default function App({ navigation }) {
  
   const authContext = React.useMemo(
     () => ({
-      signIn: (data) => {
-        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
-        console.log(data);
-      },
-      // async data => {
-      //   firebase.auth().signInWithEmailAndPassword(data.email, data.password).then((res) => {dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' }), console.log(JSON.stringify(res.user))}).catch(e => console.log(e));
-      // }
+      signIn:() => dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' }),
       signOut: () => dispatch({ type: 'SIGN_OUT' }),
       signUp: async data => {
         dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
@@ -161,7 +153,7 @@ export default function App({ navigation }) {
           {state.isLoading ? (
             <Stack.Screen name="Splashsw" component={Splash} options={{ headerShown: null, }} />
           ) : state.userToken == null ? (
-            <Stack.Screen name="Login" component={Signinscreen} options={{ headerShown: null, }} />
+            <Stack.Screen name="Login" component={Loginscreen} options={{ headerShown: null, }} />
           ) : (
 
                 <Stack.Screen name="Bottom" children={BottomNavigator} options={{ headerShown: null, }} />
